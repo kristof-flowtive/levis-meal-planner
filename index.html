@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Levi's Meal Planner</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f7f4;
+      color: #3d3d3d;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e8e5df;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-content h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #5b7a5e;
+      text-align: center;
+    }
+
+    .week-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .week-nav button {
+      background: none;
+      border: 1px solid #d4cfca;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #5b7a5e;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .week-nav button:hover { background: #f0eeea; }
+
+    .week-range {
+      font-size: 14px;
+      font-weight: 500;
+      color: #6b6b6b;
+      text-align: center;
+      min-width: 160px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Sunday grocery banner */
+    .grocery-banner {
+      background: linear-gradient(135deg, #5b7a5e, #7a9e7e);
+      color: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .grocery-banner h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .grocery-banner p {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 16px;
+    }
+
+    .grocery-banner .grocery-list {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .grocery-banner .grocery-list ul {
+      list-style: none;
+      columns: 2;
+      gap: 16px;
+    }
+
+    .grocery-banner .grocery-list li {
+      padding: 4px 0;
+      font-size: 15px;
+      break-inside: avoid;
+    }
+
+    .grocery-banner .grocery-list li::before {
+      content: "○ ";
+      opacity: 0.7;
+    }
+
+    .grocery-banner .empty-msg {
+      font-size: 14px;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    /* Week grid */
+    .week-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .day-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e5df;
+      overflow: hidden;
+    }
+
+    .day-card.today {
+      border-color: #5b7a5e;
+      border-width: 2px;
+    }
+
+    .day-header {
+      padding: 12px 16px;
+      background: #fafaf8;
+      border-bottom: 1px solid #e8e5df;
+      font-weight: 600;
+      font-size: 14px;
+      color: #5b7a5e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .day-header .date {
+      font-weight: 400;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .day-card.today .day-header {
+      background: #f0f5f0;
+    }
+
+    .meals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+
+    .meal-slot {
+      padding: 12px 16px;
+      min-height: 80px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .meal-slot:first-child {
+      border-right: 1px solid #e8e5df;
+    }
+
+    .meal-slot:hover {
+      background: #fafaf8;
+    }
+
+    .meal-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #b0a99f;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .meal-emoji {
+      font-size: 32px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .meal-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #3d3d3d;
+    }
+
+    .meal-ingredients {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .meal-empty {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .meal-nutrition {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #f6f9f6;
+      border-radius: 6px;
+      border-left: 3px solid #5b7a5e;
+    }
+
+    .meal-nutrition-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #5b7a5e;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .meal-nutrition p {
+      font-size: 11px;
+      color: #777;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Grocery list section */
+    .grocery-section {
+      margin-top: 28px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8e5df;
+      padding: 20px;
+    }
+
+    .grocery-section h2 {
+      font-size: 16px;
+      color: #5b7a5e;
+      margin-bottom: 4px;
+    }
+
+    .grocery-section .subtitle {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 16px;
+    }
+
+    .grocery-section ul {
+      list-style: none;
+      columns: 2;
+      gap: 16px;
+    }
+
+    .grocery-section li {
+      padding: 4px 0;
+      font-size: 14px;
+      color: #555;
+      break-inside: avoid;
+    }
+
+    .grocery-section li::before {
+      content: "☐ ";
+      color: #bbb;
+    }
+
+    .grocery-section .empty-msg {
+      color: #ccc;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px 20px;
+      animation: slideUp 0.2s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal h3 {
+      font-size: 18px;
+      color: #3d3d3d;
+      margin-bottom: 20px;
+    }
+
+    .modal label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .modal input,
+    .modal textarea {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      margin-bottom: 16px;
+      -webkit-appearance: none;
+    }
+
+    .modal input:focus,
+    .modal textarea:focus {
+      outline: none;
+      border-color: #5b7a5e;
+    }
+
+    .modal textarea {
+      height: 80px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      min-height: 48px;
+    }
+
+    .btn-save {
+      background: #5b7a5e;
+      color: #fff;
+    }
+
+    .btn-save:hover { background: #4e6b51; }
+
+    .btn-cancel {
+      background: #f0eeea;
+      color: #666;
+    }
+
+    .btn-cancel:hover { background: #e4e1dc; }
+
+    .btn-clear {
+      background: none;
+      color: #c0706e;
+      font-size: 14px;
+      padding: 10px;
+      flex: 0;
+      white-space: nowrap;
+    }
+
+    .btn-clear:hover { background: #fdf0ef; }
+
+    /* Desktop tweaks */
+    @media (min-width: 640px) {
+      .modal-overlay {
+        align-items: center;
+      }
+      .modal {
+        border-radius: 16px;
+      }
+      .week-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media print {
+      header, .week-grid, .modal-overlay { display: none !important; }
+      .grocery-section, .grocery-banner { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1>Levi's Meal Planner</h1>
+    <div class="week-nav">
+      <button id="prevWeek" aria-label="Previous week">&#8592;</button>
+      <span class="week-range" id="weekRange"></span>
+      <button id="nextWeek" aria-label="Next week">&#8594;</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="groceryBanner"></div>
+  <div class="week-grid" id="weekGrid"></div>
+  <div class="grocery-section" id="grocerySection"></div>
+</div>
+
+<!-- Meal edit modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Edit Meal</h3>
+    <label for="mealNameInput">Meal Name</label>
+    <input type="text" id="mealNameInput" placeholder="e.g. Banana pancakes">
+    <label for="ingredientsInput">Ingredients (one per line)</label>
+    <textarea id="ingredientsInput" placeholder="banana&#10;oat flour&#10;egg"></textarea>
+    <label for="nutritionInput">Nutrition Summary</label>
+    <textarea id="nutritionInput" placeholder="e.g. Good source of iron and healthy fats..."></textarea>
+    <label for="notesInput">Notes (optional)</label>
+    <input type="text" id="notesInput" placeholder="e.g. Cut into strips">
+    <div class="modal-buttons">
+      <button class="btn-cancel" id="btnCancel">Cancel</button>
+      <button class="btn-clear" id="btnClear">Clear</button>
+      <button class="btn-save" id="btnSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'leviMealPlanner';
+  const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+  const DAY_LABELS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+  let currentWeekStart = getMonday(new Date());
+  let editingDay = null;
+  let editingMealType = null;
+
+  // --- Date helpers ---
+  function getMonday(d) {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    date.setDate(diff);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  function addDays(d, n) {
+    const date = new Date(d);
+    date.setDate(date.getDate() + n);
+    return date;
+  }
+
+  function toISO(d) {
+    return d.toISOString().split('T')[0];
+  }
+
+  function formatDate(d) {
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  function isSunday() {
+    return new Date().getDay() === 0;
+  }
+
+  function isCurrentWeek() {
+    return toISO(currentWeekStart) === toISO(getMonday(new Date()));
+  }
+
+  // --- Data persistence ---
+  function loadAllData() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch { return {}; }
+  }
+
+  function saveAllData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function getWeekPlan(weekStart) {
+    const data = loadAllData();
+    const key = toISO(weekStart);
+    if (!data[key]) {
+      data[key] = {};
+      DAYS.forEach(day => {
+        data[key][day] = { breakfast: null, lunch: null };
+      });
+      saveAllData(data);
+    }
+    return data[key];
+  }
+
+  function saveMeal(weekStart, day, mealType, meal) {
+    const data = loadAllData();
+    const key = toISO(weekStart);
+    if (!data[key]) {
+      data[key] = {};
+      DAYS.forEach(d => { data[key][d] = { breakfast: null, lunch: null }; });
+    }
+    data[key][day][mealType] = meal;
+    saveAllData(data);
+  }
+
+  // --- Grocery list logic ---
+  function normalizeIngredient(str) {
+    let s = str.toLowerCase().trim();
+    // Remove trailing 's' for basic pluralization
+    if (s.endsWith('es') && s.length > 3) {
+      // keep as-is for now, simple normalization
+    } else if (s.endsWith('s') && s.length > 2) {
+      s = s.slice(0, -1);
+    }
+    return s;
+  }
+
+  function generateGroceryList(weekStart) {
+    const plan = getWeekPlan(weekStart);
+    const ingredientMap = new Map();
+
+    DAYS.forEach(day => {
+      ['breakfast', 'lunch'].forEach(mealType => {
+        const meal = plan[day][mealType];
+        if (meal && meal.ingredients) {
+          meal.ingredients.forEach(ing => {
+            if (!ing.trim()) return;
+            const normalized = normalizeIngredient(ing);
+            if (!ingredientMap.has(normalized)) {
+              ingredientMap.set(normalized, ing.trim());
+            }
+          });
+        }
+      });
+    });
+
+    return Array.from(ingredientMap.values()).sort((a, b) =>
+      a.toLowerCase().localeCompare(b.toLowerCase())
+    );
+  }
+
+  // --- Rendering ---
+  function render() {
+    renderWeekNav();
+    renderSundayBanner();
+    renderWeekGrid();
+    renderGrocerySection();
+  }
+
+  function renderWeekNav() {
+    const sunday = addDays(currentWeekStart, 6);
+    document.getElementById('weekRange').textContent =
+      formatDate(currentWeekStart) + ' – ' + formatDate(sunday);
+  }
+
+  function renderSundayBanner() {
+    const banner = document.getElementById('groceryBanner');
+    if (isSunday() && isCurrentWeek()) {
+      const nextMonday = addDays(getMonday(new Date()), 7);
+      const items = generateGroceryList(nextMonday);
+      const nextSunday = addDays(nextMonday, 6);
+      banner.innerHTML = `
+        <div class="grocery-banner">
+          <h2>Grocery List for Next Week</h2>
+          <p>${formatDate(nextMonday)} – ${formatDate(nextSunday)}</p>
+          <div class="grocery-list">
+            ${items.length > 0
+              ? '<ul>' + items.map(i => '<li>' + escapeHTML(i) + '</li>').join('') + '</ul>'
+              : '<div class="empty-msg">No meals planned for next week yet. Plan ahead to see your grocery list here!</div>'
+            }
+          </div>
+        </div>
+      `;
+    } else {
+      banner.innerHTML = '';
+    }
+  }
+
+  function renderWeekGrid() {
+    const grid = document.getElementById('weekGrid');
+    const plan = getWeekPlan(currentWeekStart);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    grid.innerHTML = DAYS.map((day, i) => {
+      const date = addDays(currentWeekStart, i);
+      const isToday = toISO(date) === toISO(today);
+      const breakfast = plan[day].breakfast;
+      const lunch = plan[day].lunch;
+
+      return `
+        <div class="day-card ${isToday ? 'today' : ''}">
+          <div class="day-header">
+            <span>${DAY_LABELS[i]}</span>
+            <span class="date">${formatDate(date)}</span>
+          </div>
+          <div class="meals">
+            <div class="meal-slot" data-day="${day}" data-meal="breakfast">
+              <div class="meal-label">Breakfast</div>
+              ${breakfast
+                ? `${breakfast.emoji ? '<div class="meal-emoji">' + breakfast.emoji + '</div>' : ''}
+                   <div class="meal-name">${escapeHTML(breakfast.name)}</div>
+                   ${breakfast.ingredients.length ? '<div class="meal-ingredients">' + escapeHTML(breakfast.ingredients.join(', ')) + '</div>' : ''}
+                   ${breakfast.nutrition ? '<div class="meal-nutrition"><div class="meal-nutrition-title">Nutrition Summary</div><p>' + escapeHTML(breakfast.nutrition) + '</p></div>' : ''}`
+                : '<div class="meal-empty">+ Add meal</div>'
+              }
+            </div>
+            <div class="meal-slot" data-day="${day}" data-meal="lunch">
+              <div class="meal-label">Lunch</div>
+              ${lunch
+                ? `${lunch.emoji ? '<div class="meal-emoji">' + lunch.emoji + '</div>' : ''}
+                   <div class="meal-name">${escapeHTML(lunch.name)}</div>
+                   ${lunch.ingredients.length ? '<div class="meal-ingredients">' + escapeHTML(lunch.ingredients.join(', ')) + '</div>' : ''}
+                   ${lunch.nutrition ? '<div class="meal-nutrition"><div class="meal-nutrition-title">Nutrition Summary</div><p>' + escapeHTML(lunch.nutrition) + '</p></div>' : ''}`
+                : '<div class="meal-empty">+ Add meal</div>'
+              }
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderGrocerySection() {
+    const section = document.getElementById('grocerySection');
+    const items = generateGroceryList(currentWeekStart);
+    const sunday = addDays(currentWeekStart, 6);
+
+    section.innerHTML = `
+      <h2>Grocery List</h2>
+      <div class="subtitle">${formatDate(currentWeekStart)} – ${formatDate(sunday)}</div>
+      ${items.length > 0
+        ? '<ul>' + items.map(i => '<li>' + escapeHTML(i) + '</li>').join('') + '</ul>'
+        : '<div class="empty-msg">Add meals to see your grocery list here.</div>'
+      }
+    `;
+  }
+
+  function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Modal ---
+  function openModal(day, mealType) {
+    editingDay = day;
+    editingMealType = mealType;
+    const plan = getWeekPlan(currentWeekStart);
+    const meal = plan[day][mealType];
+    const dayLabel = DAY_LABELS[DAYS.indexOf(day)];
+    const typeLabel = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+
+    document.getElementById('modalTitle').textContent = `${dayLabel} – ${typeLabel}`;
+    document.getElementById('mealNameInput').value = meal ? meal.name : '';
+    document.getElementById('ingredientsInput').value = meal ? meal.ingredients.join('\n') : '';
+    document.getElementById('nutritionInput').value = meal && meal.nutrition ? meal.nutrition : '';
+    document.getElementById('notesInput').value = meal && meal.notes ? meal.notes : '';
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('mealNameInput').focus();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    editingDay = null;
+    editingMealType = null;
+  }
+
+  function saveModal() {
+    const name = document.getElementById('mealNameInput').value.trim();
+    const ingredientsRaw = document.getElementById('ingredientsInput').value;
+    const nutrition = document.getElementById('nutritionInput').value.trim();
+    const notes = document.getElementById('notesInput').value.trim();
+
+    if (!name) {
+      saveMeal(currentWeekStart, editingDay, editingMealType, null);
+    } else {
+      const ingredients = ingredientsRaw
+        .split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      saveMeal(currentWeekStart, editingDay, editingMealType, {
+        name,
+        ingredients,
+        nutrition: nutrition || undefined,
+        notes: notes || undefined
+      });
+    }
+
+    closeModal();
+    render();
+  }
+
+  function clearMeal() {
+    saveMeal(currentWeekStart, editingDay, editingMealType, null);
+    closeModal();
+    render();
+  }
+
+  // --- Event listeners ---
+  document.getElementById('weekGrid').addEventListener('click', function(e) {
+    const slot = e.target.closest('.meal-slot');
+    if (slot) {
+      openModal(slot.dataset.day, slot.dataset.meal);
+    }
+  });
+
+  document.getElementById('prevWeek').addEventListener('click', function() {
+    currentWeekStart = addDays(currentWeekStart, -7);
+    render();
+  });
+
+  document.getElementById('nextWeek').addEventListener('click', function() {
+    currentWeekStart = addDays(currentWeekStart, 7);
+    render();
+  });
+
+  document.getElementById('btnSave').addEventListener('click', saveModal);
+  document.getElementById('btnCancel').addEventListener('click', closeModal);
+  document.getElementById('btnClear').addEventListener('click', clearMeal);
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) {
+      if (document.activeElement.tagName !== 'TEXTAREA') {
+        saveModal();
+      }
+    }
+  });
+
+  // --- Sample data for current week ---
+  function seedSampleData() {
+    const data = loadAllData();
+    const key = toISO(currentWeekStart);
+    // Only seed if the current week is empty
+    if (data[key]) {
+      const hasAnyMeal = DAYS.some(d => data[key][d].breakfast || data[key][d].lunch);
+      if (hasAnyMeal) return;
+    }
+
+    const sample = {
+      monday: {
+        breakfast: {
+          name: 'Banana Oat Pancakes',
+          emoji: '\uD83E\uDD5E',
+          ingredients: ['banana', 'oat flour', 'egg'],
+          nutrition: 'Banana provides quick-release carbs and potassium for Levi\'s muscles and heart. Oat flour adds complex carbs and fiber for steady energy and healthy digestion. The egg delivers complete protein with all essential amino acids for muscle growth, plus choline for brain development.'
+        },
+        lunch: {
+          name: 'Sweet Potato & Avocado Mash',
+          emoji: '\uD83C\uDF60',
+          ingredients: ['sweet potato', 'avocado', 'black beans'],
+          nutrition: 'Sweet potato is loaded with beta-carotene (vitamin A) for Levi\'s vision and immune system. Avocado provides healthy monounsaturated fats essential for brain development. Black beans add plant-based protein and iron for healthy blood cell production, plus fiber for digestion.'
+        }
+      },
+      tuesday: {
+        breakfast: {
+          name: 'Scrambled Egg with Toast Fingers',
+          emoji: '\uD83C\uDF73',
+          ingredients: ['egg', 'whole wheat bread', 'butter'],
+          nutrition: 'Eggs are packed with choline — critical for Levi\'s brain development and memory formation. They also provide vitamin D and selenium for immune health. Whole wheat toast adds complex carbs and B vitamins for sustained energy. Butter provides fat calories he needs for rapid growth.'
+        },
+        lunch: {
+          name: 'Broccoli & Cheese Bites',
+          emoji: '\uD83E\uDD66',
+          ingredients: ['broccoli', 'cheddar cheese', 'egg'],
+          nutrition: 'Broccoli is rich in vitamin C (boosts iron absorption), vitamin K for bone health, and calcium for strong teeth and bones. Cheddar cheese adds protein, calcium, and fat-soluble vitamins A and D. The egg binds everything together while adding more protein and choline for Levi\'s growing brain.'
+        }
+      },
+      wednesday: {
+        breakfast: {
+          name: 'Avocado Toast with Hemp Seeds',
+          emoji: '\uD83E\uDD51',
+          ingredients: ['avocado', 'whole wheat bread', 'hemp seeds'],
+          nutrition: 'Avocado is full of healthy fats that support Levi\'s brain, which is 60% fat by weight. Hemp seeds are a complete protein and rich in omega-3 and omega-6 fatty acids for cognitive development. Whole grain bread adds fiber, iron, and B vitamins for energy and blood health.'
+        },
+        lunch: {
+          name: 'Salmon & Mango Bites',
+          emoji: '\uD83E\uDD69',
+          ingredients: ['salmon fillet', 'mango', 'rice'],
+          nutrition: 'Salmon is the gold standard for omega-3 DHA — the most important fat for Levi\'s brain and eye development. It also provides high-quality protein for growth. Mango delivers vitamins A and C to boost immunity and protect cells. Rice offers easy-to-digest carbs for energy.'
+        }
+      },
+      thursday: {
+        breakfast: {
+          name: 'Blueberry Yogurt Bowl',
+          emoji: '\uD83E\uDED0',
+          ingredients: ['whole milk yogurt', 'blueberries', 'ground flaxseed'],
+          nutrition: 'Full-fat yogurt delivers calcium and vitamin D for Levi\'s developing bones and teeth, plus probiotics for a healthy gut. Blueberries are packed with antioxidants and vitamin C to protect cells and boost immunity. Flaxseed adds plant-based omega-3s for brain health and fiber for digestion.'
+        },
+        lunch: {
+          name: 'Lentil & Carrot Soup Dippers',
+          emoji: '\uD83C\uDF5C',
+          ingredients: ['red lentils', 'carrot', 'whole wheat bread'],
+          nutrition: 'Lentils are a powerhouse of plant-based protein and iron — critical for Levi\'s blood cell production and growth. High in folate which supports rapid cell division at this stage. Carrots add vitamin A for immune defense and healthy skin. Bread dippers add complex carbs and B vitamins.'
+        }
+      },
+      friday: {
+        breakfast: {
+          name: 'Peanut Butter Banana Fingers',
+          emoji: '\uD83C\uDF4C',
+          ingredients: ['banana', 'peanut butter', 'whole wheat bread'],
+          nutrition: 'Peanut butter provides protein, healthy fats, and vitamin E — great for Levi\'s brain and skin. Early allergen exposure through peanut butter is recommended to help prevent allergies. Banana gives quick energy and potassium for muscle function. A calorie-dense meal perfect for a growing baby.'
+        },
+        lunch: {
+          name: 'Egg & Pea Pasta',
+          emoji: '\uD83C\uDF5D',
+          ingredients: ['pasta', 'egg', 'peas'],
+          nutrition: 'Pasta provides complex carbohydrates for sustained energy throughout the afternoon. Eggs add complete protein and choline for brain development. Peas are surprisingly protein-rich for a vegetable and provide vitamin K for bone health, vitamin C for immunity, and fiber for healthy digestion.'
+        }
+      },
+      saturday: {
+        breakfast: {
+          name: 'French Toast Sticks',
+          emoji: '\uD83C\uDF5E',
+          ingredients: ['whole wheat bread', 'egg', 'cinnamon'],
+          nutrition: 'Rich in protein from egg — providing all essential amino acids Levi needs for tissue building. Whole wheat bread adds fiber and iron for blood health. Cinnamon has anti-inflammatory properties and traces of iron and manganese. A comforting, easy-to-hold meal that builds his self-feeding skills.'
+        },
+        lunch: {
+          name: 'Zucchini & Ricotta Bites',
+          emoji: '\uD83E\uDD5A',
+          ingredients: ['zucchini', 'ricotta cheese', 'egg'],
+          nutrition: 'Zucchini provides vitamin C to boost Levi\'s immune system and enhance iron absorption, plus potassium for muscle and heart health. Ricotta is a mild, creamy cheese rich in calcium and protein for strong bones and teeth. The egg adds more protein and fat-soluble vitamins for overall growth.'
+        }
+      },
+      sunday: {
+        breakfast: {
+          name: 'Cheese & Spinach Mini Omelette',
+          emoji: '\uD83E\uDD5A',
+          ingredients: ['egg', 'cheddar cheese', 'baby spinach'],
+          nutrition: 'Eggs and cheese together deliver a protein and calcium powerhouse for Levi\'s bones and muscles. Spinach is rich in iron, folate, and vitamin K — key for blood health and bone strength. The fat from cheese helps absorb fat-soluble vitamins A, D, E, and K. Choline from eggs supports ongoing brain development.'
+        },
+        lunch: {
+          name: 'Cod & Veggie Rice Bowl',
+          emoji: '\uD83D\uDC1F',
+          ingredients: ['cod fillet', 'rice', 'peas'],
+          nutrition: 'Cod is a mild white fish rich in protein and iodine — essential for Levi\'s thyroid function and brain development. Very low in mercury, making it one of the safest fish for babies. Rice provides gentle, easy-to-digest carbs for energy. Peas add plant protein, fiber, and vitamin C for a well-rounded meal.'
+        }
+      }
+    };
+
+    data[key] = sample;
+    saveAllData(data);
+  }
+
+  // --- Init ---
+  seedSampleData();
+  render();
+})();
+</script>
+</body>
+</html>
