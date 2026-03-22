@@ -242,6 +242,30 @@
       margin: 0;
     }
 
+    .meal-recipe {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #fdf8f0;
+      border-radius: 6px;
+      border-left: 3px solid #c9a95a;
+    }
+
+    .meal-recipe-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #b08d3e;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .meal-recipe p {
+      font-size: 11px;
+      color: #777;
+      line-height: 1.5;
+      margin: 0;
+    }
+
     /* Grocery list section */
     .grocery-section {
       margin-top: 28px;
@@ -445,6 +469,8 @@
     <input type="text" id="mealNameInput" placeholder="e.g. Banana pancakes">
     <label for="ingredientsInput">Ingredients (one per line)</label>
     <textarea id="ingredientsInput" placeholder="banana&#10;oat flour&#10;egg"></textarea>
+    <label for="recipeInput">Recipe</label>
+    <textarea id="recipeInput" placeholder="e.g. Mash banana, mix with oat flour and egg, cook on low heat..."></textarea>
     <label for="nutritionInput">Nutrition Summary</label>
     <textarea id="nutritionInput" placeholder="e.g. Good source of iron and healthy fats..."></textarea>
     <label for="notesInput">Notes (optional)</label>
@@ -459,7 +485,7 @@
 
 <script>
 (function() {
-  const STORAGE_KEY = 'leviMealPlanner';
+  const STORAGE_KEY = 'leviMealPlannerV2';
   const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
   const DAY_LABELS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
@@ -632,6 +658,7 @@
                 ? `${breakfast.emoji ? '<div class="meal-emoji">' + breakfast.emoji + '</div>' : ''}
                    <div class="meal-name">${escapeHTML(breakfast.name)}</div>
                    ${breakfast.ingredients.length ? '<div class="meal-ingredients">' + escapeHTML(breakfast.ingredients.join(', ')) + '</div>' : ''}
+                   ${breakfast.recipe ? '<div class="meal-recipe"><div class="meal-recipe-title">Recipe</div><p>' + escapeHTML(breakfast.recipe) + '</p></div>' : ''}
                    ${breakfast.nutrition ? '<div class="meal-nutrition"><div class="meal-nutrition-title">Nutrition Summary</div><p>' + escapeHTML(breakfast.nutrition) + '</p></div>' : ''}`
                 : '<div class="meal-empty">+ Add meal</div>'
               }
@@ -642,6 +669,7 @@
                 ? `${lunch.emoji ? '<div class="meal-emoji">' + lunch.emoji + '</div>' : ''}
                    <div class="meal-name">${escapeHTML(lunch.name)}</div>
                    ${lunch.ingredients.length ? '<div class="meal-ingredients">' + escapeHTML(lunch.ingredients.join(', ')) + '</div>' : ''}
+                   ${lunch.recipe ? '<div class="meal-recipe"><div class="meal-recipe-title">Recipe</div><p>' + escapeHTML(lunch.recipe) + '</p></div>' : ''}
                    ${lunch.nutrition ? '<div class="meal-nutrition"><div class="meal-nutrition-title">Nutrition Summary</div><p>' + escapeHTML(lunch.nutrition) + '</p></div>' : ''}`
                 : '<div class="meal-empty">+ Add meal</div>'
               }
@@ -685,6 +713,7 @@
     document.getElementById('modalTitle').textContent = `${dayLabel} – ${typeLabel}`;
     document.getElementById('mealNameInput').value = meal ? meal.name : '';
     document.getElementById('ingredientsInput').value = meal ? meal.ingredients.join('\n') : '';
+    document.getElementById('recipeInput').value = meal && meal.recipe ? meal.recipe : '';
     document.getElementById('nutritionInput').value = meal && meal.nutrition ? meal.nutrition : '';
     document.getElementById('notesInput').value = meal && meal.notes ? meal.notes : '';
     document.getElementById('modalOverlay').classList.add('open');
@@ -700,6 +729,7 @@
   function saveModal() {
     const name = document.getElementById('mealNameInput').value.trim();
     const ingredientsRaw = document.getElementById('ingredientsInput').value;
+    const recipe = document.getElementById('recipeInput').value.trim();
     const nutrition = document.getElementById('nutritionInput').value.trim();
     const notes = document.getElementById('notesInput').value.trim();
 
@@ -714,6 +744,7 @@
       saveMeal(currentWeekStart, editingDay, editingMealType, {
         name,
         ingredients,
+        recipe: recipe || undefined,
         nutrition: nutrition || undefined,
         notes: notes || undefined
       });
@@ -780,12 +811,14 @@
           name: 'Banana Oat Pancakes',
           emoji: '\uD83E\uDD5E',
           ingredients: ['banana', 'oat flour', 'egg'],
+          recipe: 'Mash one ripe banana in a bowl. Mix in 3 tablespoons of oat flour and 1 beaten egg until smooth. Heat a pan on low with a tiny bit of coconut oil. Drop small spoonfuls of batter and cook 2 minutes per side until golden. Let cool and cut into finger-sized strips for Levi to grab.',
           nutrition: 'Banana provides quick-release carbs and potassium for Levi\'s muscles and heart. Oat flour adds complex carbs and fiber for steady energy and healthy digestion. The egg delivers complete protein with all essential amino acids for muscle growth, plus choline for brain development.'
         },
         lunch: {
           name: 'Sweet Potato & Avocado Mash',
           emoji: '\uD83C\uDF60',
           ingredients: ['sweet potato', 'avocado', 'black beans'],
+          recipe: 'Peel and cube one small sweet potato. Steam or boil until very soft, about 12 minutes. Drain and mash. Mash half a ripe avocado separately. Rinse and gently mash a small handful of canned black beans. Combine everything in a bowl and mix until it reaches a chunky, scoopable texture.',
           nutrition: 'Sweet potato is loaded with beta-carotene (vitamin A) for Levi\'s vision and immune system. Avocado provides healthy monounsaturated fats essential for brain development. Black beans add plant-based protein and iron for healthy blood cell production, plus fiber for digestion.'
         }
       },
@@ -793,14 +826,16 @@
         breakfast: {
           name: 'Scrambled Egg with Toast Fingers',
           emoji: '\uD83C\uDF73',
-          ingredients: ['egg', 'whole wheat bread', 'butter'],
-          nutrition: 'Eggs are packed with choline — critical for Levi\'s brain development and memory formation. They also provide vitamin D and selenium for immune health. Whole wheat toast adds complex carbs and B vitamins for sustained energy. Butter provides fat calories he needs for rapid growth.'
+          ingredients: ['egg', 'whole wheat bread', 'coconut oil'],
+          recipe: 'Beat 1 egg in a bowl. Heat a small pan with a little coconut oil on low heat. Pour in the egg and gently stir with a spatula, folding slowly until soft curds form — keep it slightly underdone so it stays soft. Toast a slice of whole wheat bread, then cut into finger-width strips. Serve the egg alongside the toast fingers.',
+          nutrition: 'Eggs are packed with choline — critical for Levi\'s brain development and memory formation. They also provide vitamin D and selenium for immune health. Whole wheat toast adds complex carbs and B vitamins for sustained energy. Coconut oil provides healthy fat calories he needs for rapid growth.'
         },
         lunch: {
-          name: 'Broccoli & Cheese Bites',
+          name: 'Broccoli & Egg Bites',
           emoji: '\uD83E\uDD66',
-          ingredients: ['broccoli', 'cheddar cheese', 'egg'],
-          nutrition: 'Broccoli is rich in vitamin C (boosts iron absorption), vitamin K for bone health, and calcium for strong teeth and bones. Cheddar cheese adds protein, calcium, and fat-soluble vitamins A and D. The egg binds everything together while adding more protein and choline for Levi\'s growing brain.'
+          ingredients: ['broccoli', 'egg', 'oat flour'],
+          recipe: 'Steam 1 cup of broccoli florets until very tender, about 8 minutes. Chop finely. Mix with 1 beaten egg and 2 tablespoons of oat flour. Spoon into a greased mini muffin tin. Bake at 350\u00B0F (175\u00B0C) for 12-15 minutes until set and lightly golden. Let cool before serving — they\'re perfect for little hands.',
+          nutrition: 'Broccoli is rich in vitamin C which boosts iron absorption, vitamin K for bone health, and calcium for strong teeth. Oat flour adds complex carbs and fiber. The egg provides complete protein and choline for Levi\'s growing brain.'
         }
       },
       wednesday: {
@@ -808,13 +843,15 @@
           name: 'Avocado Toast with Hemp Seeds',
           emoji: '\uD83E\uDD51',
           ingredients: ['avocado', 'whole wheat bread', 'hemp seeds'],
+          recipe: 'Toast a slice of whole wheat bread. Mash half a ripe avocado with a fork until spreadable. Spread it evenly on the toast. Sprinkle a teaspoon of hemp seeds on top and press gently so they stick. Cut into finger-width strips for easy grabbing.',
           nutrition: 'Avocado is full of healthy fats that support Levi\'s brain, which is 60% fat by weight. Hemp seeds are a complete protein and rich in omega-3 and omega-6 fatty acids for cognitive development. Whole grain bread adds fiber, iron, and B vitamins for energy and blood health.'
         },
         lunch: {
           name: 'Salmon & Mango Bites',
           emoji: '\uD83E\uDD69',
           ingredients: ['salmon fillet', 'mango', 'rice'],
-          nutrition: 'Salmon is the gold standard for omega-3 DHA — the most important fat for Levi\'s brain and eye development. It also provides high-quality protein for growth. Mango delivers vitamins A and C to boost immunity and protect cells. Rice offers easy-to-digest carbs for energy.'
+          recipe: 'Cook a small salmon fillet by baking at 375\u00B0F (190\u00B0C) for 12 minutes or until it flakes easily. Cook rice according to package directions. Peel and dice ripe mango into small soft cubes. Flake the salmon into small pieces, checking carefully for any bones. Serve the flaked salmon over rice with mango pieces on the side.',
+          nutrition: 'Salmon is the gold standard for omega-3 DHA — the most important fat for Levi\'s brain and eye development. It also provides high-quality protein for growth. Mango delivers vitamins A and C to boost immunity. Rice offers easy-to-digest carbs for energy.'
         }
       },
       thursday: {
@@ -822,13 +859,15 @@
           name: 'Blueberry Yogurt Bowl',
           emoji: '\uD83E\uDED0',
           ingredients: ['whole milk yogurt', 'blueberries', 'ground flaxseed'],
+          recipe: 'Scoop about half a cup of plain whole milk yogurt into a bowl. Wash a small handful of blueberries — for younger babies, gently smash each one between your fingers or with a fork to reduce choking risk. Sprinkle a teaspoon of ground flaxseed over the top. Stir lightly and serve with a preloaded spoon.',
           nutrition: 'Full-fat yogurt delivers calcium and vitamin D for Levi\'s developing bones and teeth, plus probiotics for a healthy gut. Blueberries are packed with antioxidants and vitamin C to protect cells and boost immunity. Flaxseed adds plant-based omega-3s for brain health and fiber for digestion.'
         },
         lunch: {
           name: 'Lentil & Carrot Soup Dippers',
           emoji: '\uD83C\uDF5C',
           ingredients: ['red lentils', 'carrot', 'whole wheat bread'],
-          nutrition: 'Lentils are a powerhouse of plant-based protein and iron — critical for Levi\'s blood cell production and growth. High in folate which supports rapid cell division at this stage. Carrots add vitamin A for immune defense and healthy skin. Bread dippers add complex carbs and B vitamins.'
+          recipe: 'Rinse half a cup of red lentils. Peel and dice one carrot. Simmer lentils and carrot in 1.5 cups of water on low heat for about 20 minutes until everything is very soft and falling apart. Mash or blend to a thick, scoopable consistency. Toast whole wheat bread and cut into strips for dipping.',
+          nutrition: 'Lentils are a powerhouse of plant-based protein and iron — critical for Levi\'s blood cell production and growth. High in folate which supports rapid cell division at this stage. Carrots add vitamin A for immune defense. Bread dippers add complex carbs and B vitamins.'
         }
       },
       friday: {
@@ -836,13 +875,15 @@
           name: 'Peanut Butter Banana Fingers',
           emoji: '\uD83C\uDF4C',
           ingredients: ['banana', 'peanut butter', 'whole wheat bread'],
+          recipe: 'Toast a slice of whole wheat bread. Spread a thin layer of smooth peanut butter on the toast — keep it thin so it\'s not sticky or a choking risk. Slice half a banana into thin rounds and press them gently into the peanut butter. Cut the toast into finger-width strips.',
           nutrition: 'Peanut butter provides protein, healthy fats, and vitamin E — great for Levi\'s brain and skin. Early allergen exposure through peanut butter is recommended to help prevent allergies. Banana gives quick energy and potassium for muscle function. A calorie-dense meal perfect for a growing baby.'
         },
         lunch: {
           name: 'Egg & Pea Pasta',
           emoji: '\uD83C\uDF5D',
           ingredients: ['pasta', 'egg', 'peas'],
-          nutrition: 'Pasta provides complex carbohydrates for sustained energy throughout the afternoon. Eggs add complete protein and choline for brain development. Peas are surprisingly protein-rich for a vegetable and provide vitamin K for bone health, vitamin C for immunity, and fiber for healthy digestion.'
+          recipe: 'Cook a small portion of small pasta shapes (like fusilli or orzo) until very soft. Steam or boil a handful of peas until tender, then lightly mash them with a fork. Hard-boil an egg, peel, and chop into small pieces. Toss the pasta, mashed peas, and chopped egg together with a tiny drizzle of olive oil.',
+          nutrition: 'Pasta provides complex carbohydrates for sustained energy. Eggs add complete protein and choline for brain development. Peas are surprisingly protein-rich and provide vitamin K for bone health, vitamin C for immunity, and fiber for healthy digestion.'
         }
       },
       saturday: {
@@ -850,13 +891,15 @@
           name: 'French Toast Sticks',
           emoji: '\uD83C\uDF5E',
           ingredients: ['whole wheat bread', 'egg', 'cinnamon'],
-          nutrition: 'Rich in protein from egg — providing all essential amino acids Levi needs for tissue building. Whole wheat bread adds fiber and iron for blood health. Cinnamon has anti-inflammatory properties and traces of iron and manganese. A comforting, easy-to-hold meal that builds his self-feeding skills.'
+          recipe: 'Beat 1 egg in a shallow bowl with a pinch of cinnamon. Cut a slice of whole wheat bread into thick strips. Dip each strip into the egg mixture, turning to coat both sides. Cook in a lightly oiled pan on medium-low heat for about 2 minutes per side until golden and cooked through. Let cool slightly before serving.',
+          nutrition: 'Rich in protein from egg — providing all essential amino acids Levi needs for tissue building. Whole wheat bread adds fiber and iron for blood health. Cinnamon has anti-inflammatory properties and traces of iron and manganese.'
         },
         lunch: {
-          name: 'Zucchini & Ricotta Bites',
+          name: 'Zucchini & Sweet Potato Fritters',
           emoji: '\uD83E\uDD5A',
-          ingredients: ['zucchini', 'ricotta cheese', 'egg'],
-          nutrition: 'Zucchini provides vitamin C to boost Levi\'s immune system and enhance iron absorption, plus potassium for muscle and heart health. Ricotta is a mild, creamy cheese rich in calcium and protein for strong bones and teeth. The egg adds more protein and fat-soluble vitamins for overall growth.'
+          ingredients: ['zucchini', 'sweet potato', 'egg'],
+          recipe: 'Grate half a small zucchini and squeeze out excess moisture in a towel. Peel and finely grate a small piece of sweet potato. Mix the grated veggies with 1 beaten egg. Drop spoonfuls onto a lightly oiled pan on medium heat. Flatten gently and cook 3 minutes per side until golden and cooked through. Cool before serving.',
+          nutrition: 'Zucchini provides vitamin C for Levi\'s immune system and potassium for muscle health. Sweet potato adds beta-carotene (vitamin A) for vision and immune defense. The egg provides complete protein and healthy fats for overall growth and brain development.'
         }
       },
       sunday: {
@@ -864,13 +907,15 @@
           name: 'Cheese & Spinach Mini Omelette',
           emoji: '\uD83E\uDD5A',
           ingredients: ['egg', 'cheddar cheese', 'baby spinach'],
-          nutrition: 'Eggs and cheese together deliver a protein and calcium powerhouse for Levi\'s bones and muscles. Spinach is rich in iron, folate, and vitamin K — key for blood health and bone strength. The fat from cheese helps absorb fat-soluble vitamins A, D, E, and K. Choline from eggs supports ongoing brain development.'
+          recipe: 'Finely chop a small handful of baby spinach. Beat 1 egg and stir in the spinach and a tablespoon of grated cheddar cheese. Pour into a small oiled pan on low heat. Let it set for about 3 minutes, then fold in half. Cook another minute until the cheese melts and egg is fully cooked. Cut into strips.',
+          nutrition: 'Eggs and cheese together deliver a protein and calcium powerhouse for Levi\'s bones and muscles. Spinach is rich in iron, folate, and vitamin K — key for blood health and bone strength. The fat from cheese helps absorb fat-soluble vitamins A, D, E, and K.'
         },
         lunch: {
           name: 'Cod & Veggie Rice Bowl',
           emoji: '\uD83D\uDC1F',
           ingredients: ['cod fillet', 'rice', 'peas'],
-          nutrition: 'Cod is a mild white fish rich in protein and iodine — essential for Levi\'s thyroid function and brain development. Very low in mercury, making it one of the safest fish for babies. Rice provides gentle, easy-to-digest carbs for energy. Peas add plant protein, fiber, and vitamin C for a well-rounded meal.'
+          recipe: 'Cook a small portion of rice until soft. Bake a small cod fillet at 375\u00B0F (190\u00B0C) for 10-12 minutes until it flakes easily with a fork. Steam peas until tender. Flake the cod into small pieces, checking carefully for any bones. Serve the flaked fish over rice with peas mixed in.',
+          nutrition: 'Cod is a mild white fish rich in protein and iodine — essential for Levi\'s thyroid function and brain development. Very low in mercury, making it one of the safest fish for babies. Rice provides gentle carbs for energy. Peas add plant protein, fiber, and vitamin C.'
         }
       }
     };
