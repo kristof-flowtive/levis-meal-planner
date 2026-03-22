@@ -921,6 +921,126 @@
     };
 
     data[key] = sample;
+
+    // --- Next week sample data ---
+    const nextKey = toISO(addDays(currentWeekStart, 7));
+    if (!data[nextKey] || !DAYS.some(d => data[nextKey][d] && (data[nextKey][d].breakfast || data[nextKey][d].lunch))) {
+      data[nextKey] = {
+        monday: {
+          breakfast: {
+            name: 'Apple Cinnamon Oatmeal',
+            emoji: '\uD83C\uDF4E',
+            ingredients: ['rolled oats', 'apple', 'cinnamon'],
+            recipe: 'Cook 3 tablespoons of rolled oats in half a cup of water on low heat for about 5 minutes until soft and creamy. Peel and grate half a small apple and stir it in during the last minute of cooking. Sprinkle a pinch of cinnamon on top. Let cool to a safe temperature and serve with a preloaded spoon.',
+            nutrition: 'Oats provide slow-release complex carbs and soluble fiber (beta-glucan) that supports Levi\'s digestive health and keeps him full. Apple adds natural sweetness, vitamin C for immune support, and pectin fiber. Cinnamon contributes anti-inflammatory compounds and trace minerals like manganese.'
+          },
+          lunch: {
+            name: 'Hummus & Veggie Toast Strips',
+            emoji: '\uD83E\uDD6C',
+            ingredients: ['hummus', 'whole wheat bread', 'cucumber'],
+            recipe: 'Toast a slice of whole wheat bread and cut into finger-width strips. Spread a thin layer of hummus on each strip. Peel a piece of cucumber, remove the seeds, and grate or finely dice it. Place small bits of cucumber on top of the hummus strips. Serve immediately.',
+            nutrition: 'Hummus (made from chickpeas and tahini) delivers plant-based protein, iron, and healthy fats for brain development. Whole wheat bread adds complex carbs, fiber, and B vitamins for energy. Cucumber provides hydration, vitamin K for bone health, and a refreshing mild flavor.'
+          }
+        },
+        tuesday: {
+          breakfast: {
+            name: 'Chia Seed Pudding with Peach',
+            emoji: '\uD83C\uDF51',
+            ingredients: ['chia seeds', 'coconut milk', 'peach'],
+            recipe: 'Mix 2 tablespoons of chia seeds with half a cup of full-fat coconut milk. Stir well and refrigerate overnight (or at least 2 hours) until it thickens into a pudding. Peel a ripe peach, remove the pit, and dice into tiny soft pieces. Top the pudding with the peach pieces before serving.',
+            nutrition: 'Chia seeds are packed with omega-3 fatty acids for Levi\'s brain development, plus calcium, fiber, and plant protein. Coconut milk provides healthy medium-chain fats that are easy to digest and great for energy. Peach adds vitamins A and C for immune health and natural sweetness.'
+          },
+          lunch: {
+            name: 'Egg Fried Rice with Carrot',
+            emoji: '\uD83C\uDF5A',
+            ingredients: ['rice', 'egg', 'carrot'],
+            recipe: 'Cook rice until soft and let it cool slightly. Peel and finely dice a small carrot and steam or saut\u00E9 until tender. Scramble 1 egg in a lightly oiled pan, breaking it into small pieces. Add the cooked rice and carrot to the pan, stir everything together gently for a minute. Let cool before serving.',
+            nutrition: 'Rice provides gentle, easy-to-digest carbohydrates for sustained energy. Egg adds complete protein and choline for brain and nerve development. Carrot is rich in beta-carotene (vitamin A) for healthy vision, immune function, and skin.'
+          }
+        },
+        wednesday: {
+          breakfast: {
+            name: 'Pear & Almond Butter Oat Bars',
+            emoji: '\uD83C\uDF50',
+            ingredients: ['rolled oats', 'pear', 'almond butter'],
+            recipe: 'Preheat oven to 350\u00B0F (175\u00B0C). Peel and grate one ripe pear. Mix with 1 cup rolled oats and 2 tablespoons of smooth almond butter until combined. Press the mixture into a lined small baking dish about half an inch thick. Bake for 18-20 minutes until firm and lightly golden. Cool completely and cut into finger-sized bars.',
+            nutrition: 'Oats provide complex carbs and fiber for steady energy and healthy digestion. Pear adds natural sweetness, vitamin C, and gentle fiber that\'s easy on Levi\'s tummy. Almond butter delivers healthy fats, vitamin E for skin health, and protein for muscle growth.'
+          },
+          lunch: {
+            name: 'Shrimp & Avocado Rice',
+            emoji: '\uD83E\uDD90',
+            ingredients: ['shrimp', 'avocado', 'rice'],
+            recipe: 'Cook rice until very soft. Peel and devein a few small shrimp. Saut\u00E9 the shrimp in a tiny bit of olive oil for 2-3 minutes until pink and cooked through. Chop the shrimp into very small pieces appropriate for Levi\'s age. Dice half a ripe avocado. Mix the chopped shrimp and avocado into the rice.',
+            nutrition: 'Shrimp is an excellent source of lean protein and iodine for thyroid health and brain development. It\'s also rich in selenium and B12 for nerve function. Avocado adds healthy monounsaturated fats critical for Levi\'s brain. Rice provides easy-to-digest energy.'
+          }
+        },
+        thursday: {
+          breakfast: {
+            name: 'Cottage Cheese Pancakes',
+            emoji: '\uD83E\uDD5E',
+            ingredients: ['cottage cheese', 'egg', 'oat flour'],
+            recipe: 'Blend or mash a quarter cup of cottage cheese until mostly smooth. Mix with 1 beaten egg and 3 tablespoons of oat flour until combined. Heat a pan on low with a tiny bit of oil. Drop small spoonfuls of batter and cook about 2 minutes per side until golden. Cool and cut into strips.',
+            nutrition: 'Cottage cheese is rich in protein and calcium for strong bones and muscle development. It also provides B vitamins for Levi\'s energy metabolism. The egg adds choline for brain development and more complete protein. Oat flour contributes complex carbs and fiber for sustained energy.'
+          },
+          lunch: {
+            name: 'Butternut Squash & Lentil Mash',
+            emoji: '\uD83C\uDF3D',
+            ingredients: ['butternut squash', 'red lentils', 'coconut oil'],
+            recipe: 'Peel and cube a small piece of butternut squash. Rinse a quarter cup of red lentils. Simmer both together in 1 cup of water for about 18-20 minutes until everything is very soft. Drain any excess liquid. Mash together with half a teaspoon of coconut oil until it reaches a chunky, scoopable texture.',
+            nutrition: 'Butternut squash is loaded with beta-carotene (vitamin A) for Levi\'s vision and immune system, plus vitamin C and potassium. Red lentils provide plant-based protein and iron for blood cell production and growth. Coconut oil adds healthy fats to help absorb the fat-soluble vitamins.'
+          }
+        },
+        friday: {
+          breakfast: {
+            name: 'Mashed Banana on Rice Cakes',
+            emoji: '\uD83C\uDF4C',
+            ingredients: ['banana', 'rice cakes', 'tahini'],
+            recipe: 'Mash half a ripe banana with a fork. Spread a thin layer of tahini on 2-3 unsalted rice cakes (use baby-friendly thin ones that dissolve easily). Top with the mashed banana. Break into manageable pieces if the rice cakes are large.',
+            nutrition: 'Banana provides quick energy, potassium for heart and muscle function, and vitamin B6 for brain development. Tahini (ground sesame) is rich in calcium, iron, and healthy fats — it\'s one of the best plant sources of calcium. Rice cakes add a light, easy-to-hold carb base.'
+          },
+          lunch: {
+            name: 'Trout & Sweet Potato Bowl',
+            emoji: '\uD83D\uDC1F',
+            ingredients: ['trout fillet', 'sweet potato', 'peas'],
+            recipe: 'Peel and cube a small sweet potato and steam until very tender, about 12 minutes. Bake a small trout fillet at 375\u00B0F (190\u00B0C) for 10 minutes until it flakes easily. Steam a handful of peas until soft. Flake the trout carefully, removing any bones. Mash the sweet potato lightly and serve with fish and peas.',
+            nutrition: 'Trout is rich in omega-3 DHA for Levi\'s brain and eye development, and provides high-quality protein and vitamin D. Sweet potato delivers beta-carotene (vitamin A) for immune defense and vision. Peas add plant protein, vitamin C, and fiber for healthy digestion.'
+          }
+        },
+        saturday: {
+          breakfast: {
+            name: 'Spinach & Egg Mini Muffins',
+            emoji: '\uD83E\uDDC1',
+            ingredients: ['egg', 'baby spinach', 'oat flour'],
+            recipe: 'Preheat oven to 350\u00B0F (175\u00B0C). Finely chop a small handful of baby spinach. Beat 2 eggs and mix in the spinach and 2 tablespoons of oat flour. Pour into a greased mini muffin tin, filling each about three-quarters full. Bake for 12-14 minutes until set and lightly golden. Cool before serving.',
+            nutrition: 'Eggs deliver complete protein and choline for Levi\'s brain development and memory. Spinach is rich in iron for blood health, folate for cell growth, and vitamin K for strong bones. Oat flour adds complex carbs and fiber for steady energy throughout the morning.'
+          },
+          lunch: {
+            name: 'Bean & Tomato Pasta',
+            emoji: '\uD83C\uDF5D',
+            ingredients: ['pasta', 'white beans', 'tomato'],
+            recipe: 'Cook small pasta shapes until very soft. Rinse canned white beans and mash half of them lightly with a fork, leaving some whole for texture. Dice a ripe tomato, removing the skin if preferred. Warm the beans and tomato together in a small pan for 3 minutes. Toss with the cooked pasta.',
+            nutrition: 'White beans are an excellent source of plant-based protein, iron, and fiber for Levi\'s growth and digestion. Tomato adds vitamin C (which helps absorb the iron from beans), vitamin A, and lycopene antioxidants. Pasta provides complex carbs for sustained afternoon energy.'
+          }
+        },
+        sunday: {
+          breakfast: {
+            name: 'Yogurt Oat Cups with Strawberry',
+            emoji: '\uD83C\uDF53',
+            ingredients: ['whole milk yogurt', 'rolled oats', 'strawberry'],
+            recipe: 'Mix a quarter cup of rolled oats into half a cup of whole milk yogurt. Let it sit in the fridge for at least 30 minutes (or overnight) so the oats soften. Wash and hull 2-3 ripe strawberries, then mash or finely dice them. Top the yogurt-oat mixture with the strawberries before serving.',
+            nutrition: 'Full-fat yogurt provides calcium and vitamin D for Levi\'s developing bones and teeth, plus probiotics for gut health. Oats add fiber and complex carbs for sustained energy. Strawberries are packed with vitamin C for immunity and antioxidants to protect growing cells.'
+          },
+          lunch: {
+            name: 'Veggie Egg Scramble with Toast',
+            emoji: '\uD83C\uDF73',
+            ingredients: ['egg', 'red pepper', 'whole wheat bread'],
+            recipe: 'Finely dice a small piece of red pepper and saut\u00E9 in a lightly oiled pan on medium heat for 3-4 minutes until soft. Beat 1 egg and pour over the pepper. Stir gently, folding slowly until soft curds form. Toast a slice of whole wheat bread and cut into strips. Serve the scramble alongside the toast fingers.',
+            nutrition: 'Egg provides complete protein, choline for brain development, and vitamin D for bone health. Red pepper is one of the richest sources of vitamin C — even more than oranges — boosting iron absorption and immune function. Whole wheat toast adds complex carbs, fiber, and B vitamins.'
+          }
+        }
+      };
+    }
+
     saveAllData(data);
   }
 
