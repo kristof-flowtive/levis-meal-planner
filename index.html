@@ -485,7 +485,7 @@
 
 <script>
 (function() {
-  const STORAGE_KEY = 'leviMealPlannerV2';
+  const STORAGE_KEY = 'leviMealPlannerV3';
   const DAYS = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
   const DAY_LABELS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
@@ -799,12 +799,10 @@
   function seedSampleData() {
     const data = loadAllData();
     const key = toISO(currentWeekStart);
-    // Only seed if the current week is empty
-    if (data[key]) {
-      const hasAnyMeal = DAYS.some(d => data[key][d].breakfast || data[key][d].lunch);
-      if (hasAnyMeal) return;
-    }
+    // Only seed current week if it's empty
+    const currentHasMeals = data[key] && DAYS.some(d => data[key][d] && (data[key][d].breakfast || data[key][d].lunch));
 
+    if (!currentHasMeals) {
     const sample = {
       monday: {
         breakfast: {
@@ -921,6 +919,7 @@
     };
 
     data[key] = sample;
+    } // end current week seed
 
     // --- Next week sample data ---
     const nextKey = toISO(addDays(currentWeekStart, 7));
